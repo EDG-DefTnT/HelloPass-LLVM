@@ -1,0 +1,4 @@
+/Users/wangzhongqi/Google Drive/Course/CS201/Project/Project3/HelloPass-LLVM/Pass/build/CMakeFiles/rebuild_cache.dir
+/Users/wangzhongqi/Google Drive/Course/CS201/Project/Project3/HelloPass-LLVM/Pass/build/CMakeFiles/edit_cache.dir
+/Users/wangzhongqi/Google Drive/Course/CS201/Project/Project3/HelloPass-LLVM/Pass/build/CMakeFiles/LLVMValueNumberingPass.dir
+/Users/wangzhongqi/Google Drive/Course/CS201/Project/Project3/HelloPass-LLVM/Pass/build/CMakeFiles/intrinsics_gen.dir

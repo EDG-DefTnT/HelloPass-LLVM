@@ -1,0 +1,91 @@
+#include "llvm/IR/Function.h"
+#include "llvm/IR/Instruction.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Type.h"
+#include "llvm/Pass.h"
+#include "llvm/Support/raw_ostream.h"
+#include <algorithm>
+#include <iterator>
+#include <list>
+#include <map>
+#include <set>
+#include <string>
+#include <utility>
+using namespace llvm;
+using namespace std;
+
+#define DEBUG_TYPE "ValueNumbering"
+
+using namespace llvm;
+
+namespace {
+struct ValueNumbering : public FunctionPass {
+  string func_name = "test";
+  static char ID;
+  ValueNumbering() : FunctionPass(ID) {}
+
+  bool runOnFunction(Function &F) override {
+    if (F.getName() != func_name)
+      return false;
+    std::map<BasicBlock *, std::set<std::string>> GlobalUE;
+    std::map<BasicBlock *, std::set<std::string>>::iterator globalue;
+    std::map<BasicBlock *, std::set<std::string>> GlobalKill;
+    std::map<BasicBlock *, std::set<std::string>>::iterator globalkill;
+
+    for (auto &basic_block : F) {
+      std::set<std::string> UEVar;
+      std::set<std::string> VarKill;
+      GlobalUE.insert(
+          std::pair<BasicBlock *, std::set<std::string>>(&basic_block, UEVar));
+      GlobalKill.insert(std::pair<BasicBlock *, std::set<std::string>>(
+          &basic_block, VarKill));
+
+      for (auto &Instruction : basic_block) {
+        // https://llvm.org/doxygen/Instruction_8cpp_source.html
+        for (int inst = 0; inst < Instruction.getNumOperands(); inst++) {
+          std::string Variable = Instruction.getOperand(inst)->getName();
+          if (Instruction.getOpcode() == 1 || Instruction.getOpcode() == 2)
+            continue;
+          globalkill = GlobalKill.find(&basic_block);
+          if (globalkill->second.find(Variable) != globalkill->second.end())
+            continue;
+          globalue = GlobalUE.find(&basic_block);
+          UEVar = globalkill->second;
+          if (!(Instruction.getOpcode() == 31 && i == 1)) {
+            UEVar.insert(Variable);
+          }
+        }
+        GlobalUE.erase(globalue);
+        GlobalUE.insert(std::pair<BasicBlock *, std::set<std::string>>(
+            &basic_block, UEVar));
+        if (I.getOpcode() == 31 && i == 1) {
+          // put var into Varkill
+          kit = VK.find(&BB);
+          VarKill = kit->second;
+          // insert current name (LHS)
+          VarKill.insert(varName);
+          VK.erase(kit);
+          VK.insert(
+              std::pair<BasicBlock *, std::set<llvm::StringRef>>(&BB, VarKill));
+        }
+      }
+    }
+    for (auto &basic_block : F) {
+      errs() << "----- " << basic_block.getName() << " -----\n";
+      errs() << "UEVAR:";
+      errs() << "\n";
+      errs() << "VARKILL:";
+      errs() << "\n";
+      errs() << "LIVEOUT:";
+      errs() << "\n";
+    }
+    return false;
+  }
+}; // end of struct ValueNumbering
+} // end of anonymous namespace
+
+char ValueNumbering::ID = 0;
+static RegisterPass<ValueNumbering> X("ValueNumbering", "ValueNumbering Pass",
+                                      false /* Only looks at CFG */,
+                                      false /* Analysis Pass */);
